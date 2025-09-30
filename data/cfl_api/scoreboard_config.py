@@ -11,7 +11,7 @@ class ScoreboardConfig:
     try:
         def __init__(self, filename_base, args):
             input_json = self.__get_config(filename_base)
-            config = config_models.ConfigModel.parse_obj(input_json)
+            config = config_models.ConfigModel.model_validate(input_json)
 
             # Preferred Teams
             self.preferred_teams = config.preferred_teams
@@ -22,7 +22,7 @@ class ScoreboardConfig:
             # Rotation
             self.rotation_enabled = config.rotation.enabled
             self.rotation_only_preferred = config.rotation.only_preferred
-            self.rotation_rates = config.rotation.rates.dict()
+            self.rotation_rates = config.rotation.rates.model_dump()
             self.rotation_preferred_team_live_enabled = config.rotation.while_preferred_team_live
             self.rotation_preferred_team_live_halftime = config.rotation.while_preferred_team_halftime
 

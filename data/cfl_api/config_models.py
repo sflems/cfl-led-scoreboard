@@ -1,7 +1,7 @@
 from __future__ import annotations
-from typing import List
+from typing import FrozenSet
 from enum import Enum
-from pydantic import BaseModel, Field
+from pydantic import ConfigDict, BaseModel, Field
 
 
 class Rates(BaseModel):
@@ -40,8 +40,8 @@ class Team(str, Enum):
 
 
 class ConfigModel(BaseModel):
-    preferred_teams: List[Team] = Field(..., title="Preferred Teams",
-                                        description="List of preferred teams to display. First is priority.", unique_items=True)
+    preferred_teams: FrozenSet[Team] = Field(..., title="Preferred Teams",
+                                        description="List of preferred teams to display. First is priority.")
     rotation: Rotation
     helmet_logos: bool = Field(
         default=False,
@@ -51,7 +51,4 @@ class ConfigModel(BaseModel):
                                      ge=5, description="Sets refresh rate for games data. Overrides rotation rates to limit requests* (Min=5.0)")
     debug: bool = Field(..., description="Enable debugging.")
     testing: bool = Field(..., description="Enabled test data.")
-
-    class Config:
-        title = 'CFL LED Scoreboard Config Schema'
-        use_enum_values = True
+    model_config = ConfigDict(title='CFL LED Scoreboard Config Schema', use_enum_values=True)
