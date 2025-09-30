@@ -1,40 +1,134 @@
 #!/bin/bash
 
+# Functions
+py_ver () {
+  pyver="$(command -p python3 -V | sed 's/Python //g')"
+  echo $pyver
+}
+
 # Make script work regardless of where it is run from
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-cd "${DIR}/.." || exit
+cd "${DIR}/.."
+pwd
 
-echo "$(tput setaf 6)Installing required dependencies. This may take some time (10-20 minutes-ish)...$(tput setaf 9)"
+# Don't run as root
+if [ $(id -u) -eq 0 ]; then
+  tput bold; echo "$(tput setaf 9)You do not need to run this script using sudo, it will handle sudo as required$(tput setaf 9)" ; tput sgr0
+  exit 1
+fi
 
-pip3 install --upgrade pip wheel setuptools
+tput bold; echo "$(tput setaf 2)Installing required OS dependencies. This may take some time (10-20 minutes-ish)...$(tput setaf 9)" ; tput sgr0
 
-#Install all requirements using the requirements.txt filler
+#Install all apt requirements using aptfile
+sudo $DIR/aptfile apt-requirements
+
+# Update system pip3 to latest version
+if $(dpkg --compare-versions $(py_ver) "gt" "3.10.0"); then
+  sudo python3 -m pip install --upgrade pip --break-system-packages
+else
+  sudo python3 -m pip install --upgrade pip
+fi
+
+# push users to using a venv
+tput bold; echo "$(tput setaf 2)Creating python virtual environment...$(tput setaf 9)" ; tput sgr0
+
+# Install virtual enviroment, required for upcoming bookworm release
+# Use already installed site-packages that were installed as part o fthe apt OS dependencies
+python3 -m venv $HOME/cflsb-venv --system-site-packages
+
+# Activate the direnv to allow for automatic activate and deactivate of venv
+tput bold; echo "$(tput setaf 2)Activating direnv for python venv...$(tput setaf 9)" ; tput sgr0
+
+echo "export VIRTUAL_ENV=~/cflsb-venv" >> .envrc
+echo "source ~/cflsb-venv/bin/activate" >> .envrc
+direnv allow .
+if ! grep -q sb-init ~/.bashrc; then
+# Update bashrc
+tee -a  ~/.bashrc << 'TEXT0'
+# ADDED BY sb-init script for cfl-led-scoreboard
+show_virtual_env() {
+if [[ -n "$VIRTUAL_ENV" && -n "$DIRENV_DIR" ]]; then
+echo "($(basename $VIRTUAL_ENV)) "
+fi
+}
+export -f show_virtual_env
+PS1='$(show_virtual_env)'$PS1
+
+export DIRENV_LOG_FORMAT=
+eval "$(direnv hook bash)"
+TEXT0
+fi
+
+echo "$(tput setaf 6)Activating python virtual environment...$(tput setaf 9)"
+
+source $HOME/cflsb-venv/bin/activate
+
+echo "$(tput setaf 6)Updating pip in virtual environment...$(tput setaf 9)"
+# Update pip in the virtual enviroment
+python3 -m pip install --upgrade pip
+#Install all pip3 requirements using the requirements.txt file
+#This will install into the virtual environment
+
+tput bold; echo "$(tput setaf 2)Installing scoreboard python requirements in virtual environment...$(tput setaf 9)" ; tput sgr0
 pip3 install -r requirements.txt
+
+tput bold; echo "$(tput setaf 4)...................................................$(tput setaf 9)" ; tput sgr0
+tput bold; echo "$(tput setaf 4)TAKE NOTE OF NEXT LINES...$(tput setaf 9)" ; tput sgr0  
+tput bold; echo "$(tput setaf 4)WITH A VENV, Your python is now located differently...$(tput setaf 9)" ; tput sgr0
+tput bold; echo "$(tput setaf 4)TO RUN WITH SUDO, YOU MUST USE THE VENV LOCATION...$(tput setaf 9)" ; tput sgr0
+tput bold; echo "$(tput setaf 4).................PYTHON LOOKS LIKE.....................$(tput setaf 9)" ; tput sgr0
+tput bold; echo "$(tput setaf 1)sudo $HOME/cflsb-venv/bin/python3 $(tput setaf 9)" ; tput sgr0
+tput bold; echo "$(tput setaf 4)...................................................$(tput setaf 9)" ; tput sgr0
 
 # Pull submodule and ignore changes from script
 git submodule update --init --recursive
 git config submodule.matrix.ignore all
 
-echo "$(tput setaf 4)Running rgbmatrix installation...$(tput setaf 9)"
+tput bold; echo "$(tput setaf 4)Running rgbmatrix installation...$(tput setaf 9)" ; tput sgr0
 
+# No longer needed for newer version of the rgb matric repo as of Dec 2021
 # Recompile the cpp files to build library with newest cython.  See https://github.com/hzeller/rpi-rgb-led-matrix/issues/1298
 
-cd submodules/matrix/bindings/python/rgbmatrix/ || exit
+cd submodules/matrix/ || exit
 
-python3 -m pip install --no-cache-dir cython
-python3 -m cython -2 --cplus *.pyx
+# python3 -m pip install --no-cache-dir cython
+# python3 -m cython -2 --cplus *.pyx
 
-cd ../../../ || exit
+# cd ../../ || exit
 
 make build-python PYTHON="$(command -v python3)"
-sudo make install-python PYTHON="$(command -v python3)"
 
-cd ../../../ || exit
+#make install-python PYTHON="$(command -v python3)"
+# The --use-pep517 is required for newer versions of pip to install the package correctly
+pip3 install bindings/python/ --use-pep517
 
-git reset --hard
-git fetch origin --prune
-git pull
 
-make
-echo "If you didn't see any errors above, everything should be installed!"
-echo "$(tput bold)$(tput smso)$(tput setaf 2)Installation complete!$(tput sgr0) Play around with the examples in cfl-led-scoreboard/submodules/matrix/bindings/python/samples to make sure your matrix is working."
+cd ../../ || exit
+
+tput bold; echo "$(tput setaf 4)Blacklisting sound module...$(tput setaf 9)" ; tput sgr0
+# Blacklist the snd_bcm2835 sounds module
+sudo tee /etc/modprobe.d/blacklist-rgbmatrix.conf <<TEXT1
+## Make sure the sound module does not load as it causes issues with the timing for the rgb matrix library
+blacklist snd_bcm2835
+
+# The next time the loading of the module is attempted, the /bin/false
+# will be executed instead. This will prevent the module from being
+# loaded on-demand.
+
+install snd_bcm_2835 /bin/false
+
+TEXT1
+
+# Unload the sound module
+sudo modprobe -r snd_bcm2835
+
+# Rebuild module dependacy
+sudo depmod -a
+
+if ! grep -q isolcpus /boot/firmware/cmdline.txt; then
+ tput bold; echo "$(tput setaf 4)Optimizing pi for python (isolating cpus)...$(tput setaf 9)" ; tput sgr0
+ sudo sed -i 's/$/ isolcpus=3/' /boot/cmdline.txt
+fi
+
+tput bold; echo "$(tput setaf 6)If you didn't see any errors above, everything should be installed!"; tput sgr0
+echo "$(tput bold)$(tput smso)$(tput setaf 2)Installation complete!$(tput sgr0) Reboot, then Play around with the examples in cfl-led-scoreboard/submodules/matrix/bindings/python/samples to make sure your matrix is working."

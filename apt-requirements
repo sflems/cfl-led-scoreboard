@@ -1,0 +1,32 @@
+#!/usr/bin/env aptfile
+
+# trigger an apt-get update
+update
+
+# install some packages
+package "build-essential"
+package "git"
+package "direnv"
+package "python3-setuptools"
+package "python3-pip"
+package "python3-dev"
+package "python3-numpy"
+package "python3-venv"
+package "python3-lxml"
+package "libatlas-base-dev"
+package "libcairo2"
+package "libopenblas0"
+package "libatlas-base-dev"
+package "libraqm-dev"
+
+#For building latest rgbmatrix python bindings
+package "cython3"
+
+#For dietpi users without dbus
+package "dbus"
+package "libdbus-glib-1-dev"
+package "libgirepository1.0-dev" 
+package "libdbus-1-dev"
+
+# you can also execute arbitrary bash
+echo "🚨  ALL GOOD TO GO"
