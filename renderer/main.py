@@ -1,7 +1,7 @@
 import time as t
 from datetime import  timedelta
 from tzlocal import get_localzone
-from PIL import Image, ImageFont, ImageDraw, ImageSequence
+from PIL import Image, ImageFont, ImageDraw
 from utils import center_text, calculate_aspect, get_logo
 import debug
 
@@ -157,8 +157,8 @@ class MainRenderer:
             self.image.paste(away_team_logo, (round(-0.11 * self.width), round(0.12 * self.height)), mask=away_team_logo)
 
         # Center the game time on screen
-        date_pos = center_text(self.font_mini.getsize(date_text)[0], self.width / 2)
-        gametime_pos = center_text(self.font_mini.getsize(gametime)[0], self.width / 2)
+        date_pos = center_text(self.font_mini.getlength(date_text), self.width / 2)
+        gametime_pos = center_text(self.font_mini.getlength(gametime), self.width / 2)
 
         # Draw the text on the Data image.
         self.draw.text((date_pos, 0), date_text, font=self.font_mini, stroke_width=1, stroke_fill=(0,0,0))
@@ -209,7 +209,7 @@ class MainRenderer:
             self.image.paste(away_team_logo, (round(-0.11 * self.width), round(0.12 * self.height)), mask=away_team_logo)
 
         # Center the game time on screen.
-        gametime_pos = center_text(self.font_mini.getsize(gametime)[0], self.width / 2)
+        gametime_pos = center_text(self.font_mini.getlength(gametime), self.width / 2)
 
         # Draw the text on the Data image.
         self.draw.text((round(0.4531 * self.width), 0), 'IN', font=self.font_mini, stroke_width=1, stroke_fill=(0,0,0))
@@ -265,9 +265,9 @@ class MainRenderer:
             pos_colour = (255, 25, 25)
 
         # Set the position of the information on screen.
-        home_score_size = self.font.getsize(homescore)[0]
-        time_period_pos = center_text(self.font_mini.getsize(time_period)[0], self.width / 2)
-        quarter_pos = center_text(self.font_small.getsize(quarter)[0], self.width / 2)
+        home_score_size = self.font.length(homescore)
+        time_period_pos = center_text(self.font_mini.getlength(time_period), self.width / 2)
+        quarter_pos = center_text(self.font_small.getlength(quarter), self.width / 2)
 
         # Draw Quarter
         self.draw.multiline_text((quarter_pos, 0), quarter, fill=(255, 255, 255), font=self.font_small, align="center", stroke_width=1, stroke_fill=(0,0,0))
@@ -282,13 +282,13 @@ class MainRenderer:
                 down = f"<> {down}"
             elif game['possession'] == game['home_team_abbrev']:
                 down = f" {down} <>"
-            info_pos = center_text(self.font_mini.getsize(down)[0], self.width / 2)
+            info_pos = center_text(self.font_mini.getlength(down), self.width / 2)
             self.draw.multiline_text((info_pos, round(0.5937 * self.height)), down, fill=(pos_colour), font=self.font_mini, align="center", stroke_width=1, stroke_fill=(0,0,0))
 
         # Draw Ball Spot
         if game['spot']:
             spot = f"{game['spot']}"
-            info_pos = center_text(self.font_mini.getsize(spot)[0], self.width / 2)
+            info_pos = center_text(self.font_mini.getlength(spot), self.width / 2)
             self.draw.multiline_text((info_pos, round(0.7812 * self.height)), spot, fill=(pos_colour), font=self.font_mini, align="center", stroke_width=1, stroke_fill=(0,0,0))
 
         # Draw Scores
@@ -334,7 +334,7 @@ class MainRenderer:
         score = '{}-{}'.format(game['away_score'], game['home_score'])
 
         # Set the position of the information on screen.
-        score_position = center_text(self.font.getsize(score)[0], self.width / 2)
+        score_position = center_text(self.font.getlength(score), self.width / 2)
         # Draw the text on the Data image.
         self.draw.multiline_text((score_position, 0), score, fill=(255, 255, 255), font=self.font, align="center", stroke_width=1, stroke_fill=(0,0,0))
         self.draw.multiline_text((round(0.375 * self.width), round(0.38 * self.height)), "FINAL", fill=(255, 255, 255), font=self.font_mini,align="center", stroke_width=1, stroke_fill=(0,0,0))
