@@ -11,7 +11,5 @@
 		"while_preferred_team_live": false,
 		"while_preferred_team_halftime": false
 	},
-	"data_refresh_rate": 15.0,
-    "debug": false,
-    "testing": false
+	"data_refresh_rate": 15.0
 }

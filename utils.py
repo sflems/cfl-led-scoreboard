@@ -73,6 +73,10 @@ def args():
                         help="Integer for current season week to use. For testing purposes.", type=int)
     parser.add_argument("--season", action="store",
                         help="Integer for current season to use. For testing purposes.", type=int)
+    
+    # Debugging
+    parser.add_argument("--logcolor", action="store_true", help="Display log in color (command line only)")
+    parser.add_argument("--loglevel", action="store", help="log level to display (INFO,WARN,ERROR,CRITICAL,DEBUG)", type=str)
 
     return parser.parse_args()
 

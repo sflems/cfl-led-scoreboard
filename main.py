@@ -12,9 +12,18 @@ SCRIPT_VERSION = "1.0.0"
 args = args()
 
 # Read scoreboard options from config.json if it exists
-config = ScoreboardConfig("config", args)
-debug.set_debug_status(config.debug)
 
+config = ScoreboardConfig("config", args)
+#If we pass the logging arguments on command line, override what's in the config.json, else use what's in config.json (color will always be false in config.json)
+if args.logcolor and args.loglevel is not None:
+      debug.set_debug_status(config.debug, logcolor=args.logcolor, loglevel=args.loglevel)
+elif not args.logcolor and args.loglevel is not None:
+      debug.set_debug_status(config.debug, loglevel=args.loglevel)
+elif args.logcolor and args.loglevel is None:
+      debug.set_debug_status(config.debug, logcolor=args.logcolor, loglevel=config.loglevel)
+else:
+      debug.set_debug_status(config.debug, loglevel=config.loglevel)
+      
 # Check for led configuration arguments
 matrixOptions = led_matrix_options(args)
 
