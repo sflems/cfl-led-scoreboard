@@ -1,7 +1,9 @@
 import json
+import logging
 import os
 from utils import get_file
-import debug
+
+debug = logging.getLogger("cfl-scoreboard")
 
 DEFAULT_PREFERRED_TEAMS = ["BC", "HAM"]
 DEFAULT_SCROLLING_SPEED = 2

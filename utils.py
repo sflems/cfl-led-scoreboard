@@ -6,7 +6,9 @@ import pytz
 from PIL import Image
 from tzlocal import get_localzone
 from rgbmatrix import RGBMatrixOptions, graphics
-import debug
+import logging
+
+debug = logging.getLogger("cfl-scoreboard")
 
 # get local timezone
 local_tz = get_localzone()
@@ -77,12 +79,13 @@ def args():
     # Debugging
     parser.add_argument("--logcolor", action="store_true", help="Display log in color (command line only)")
     parser.add_argument("--loglevel", action="store", help="log level to display (INFO,WARN,ERROR,CRITICAL,DEBUG)", type=str)
+    parser.add_argument("--led-no-drop-privs ", action="store_true", help="maintain sudo priveleges")
 
     return parser.parse_args()
 
 
 def led_matrix_options(args):
-    debug.log(f"Loaded arguments: {args}")
+    debug.debug(f"Loaded arguments: {args}")
     options = RGBMatrixOptions()
 
     if args.led_gpio_mapping is not None:
@@ -106,15 +109,13 @@ def led_matrix_options(args):
         options.pixel_mapper_config = args.led_pixel_mapper
     except AttributeError:
         debug.warning("Your compiled RGB Matrix Library is out of date.")
-        debug.warning(
-            "The --led-pixel-mapper argument will not work until it is updated.")
+        debug.warning("The --led-pixel-mapper argument will not work until it is updated.")
 
     try:
         options.pwm_dither_bits = args.led_pwm_dither_bits
     except AttributeError:
         debug.warning("Your compiled RGB Matrix Library is out of date.")
-        debug.warning(
-            "The --led-pwm-dither-bits argument will not work until it is updated.")
+        debug.warning("The --led-pwm-dither-bits argument will not work until it is updated.")
 
     if args.led_show_refresh:
         options.show_refresh_rate = 1

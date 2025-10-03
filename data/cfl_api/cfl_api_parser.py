@@ -4,11 +4,13 @@ such as the scoreboard and the box score.
 """
 from datetime import datetime, timedelta
 import requests
-import debug
+import logging
 from . import scoreboard_config as sb_config
 from . import data as Data
 from utils import args
 from cfl import CFLClient
+
+debug = logging.getLogger("cfl-scoreboard")
 
 ARGS = args()
 SB_CONFIG = sb_config.ScoreboardConfig("config", ARGS)

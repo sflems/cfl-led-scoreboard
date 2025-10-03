@@ -1,7 +1,9 @@
 from datetime import datetime, timedelta
+import logging
 import time as t
 from . import nfl_api_parser as nflparser
-import debug
+
+debug = logging.getLogger("cfl-scoreboard")
 
 NETWORK_RETRY_SLEEP_TIME = 10.0
 
@@ -143,7 +145,7 @@ class Data:
     # Debug info
 
     def print_overview_debug(self):
-        debug.log("Overview Refreshed: {}".format(self.overview.id))
-        debug.log("Pre: {}".format(Pregame(self.overview, self.config.time_format)))
-        debug.log("Live: {}".format(Scoreboard(self.overview)))
-        debug.log("Final: {}".format(Final(self.current_game())))
+        debug.info("Overview Refreshed: {}".format(self.overview.id))
+        debug.info("Pre: {}".format(Pregame(self.overview, self.config.time_format)))
+        debug.info("Live: {}".format(Scoreboard(self.overview)))
+        debug.info("Final: {}".format(Final(self.current_game())))

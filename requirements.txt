@@ -1,6 +1,8 @@
 cfl-sdk
-pydantic
-python-dotenv>=0.20.0
+requests
+rich
+richcolorlog
+pillow
 pytz>=2022.2.1
-requests==2.22.0
+pydantic
 tzlocal~=2.0

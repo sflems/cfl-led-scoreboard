@@ -1,9 +1,12 @@
 import time as t
 from datetime import  timedelta
+import logging
+from numpy import kaiser
 from tzlocal import get_localzone
 from PIL import Image, ImageFont, ImageDraw
 from utils import center_text, calculate_aspect, get_logo
-import debug
+
+debug = logging.getLogger("cfl-scoreboard")
 
 
 class MainRenderer:
@@ -16,8 +19,7 @@ class MainRenderer:
         self.height = matrix.height
         self.aspect = calculate_aspect(self.width, self.height)
 
-        debug.log(
-            f"Aspect ratio detected: {self.aspect} ({self.width}x{self.height})")
+        debug.info(f"Aspect ratio detected: {self.aspect} ({self.width}x{self.height})")
 
         # Create a new data image.
         self.image = Image.new('RGB', (self.width, self.height))
@@ -39,19 +41,19 @@ class MainRenderer:
 
     def __render_game(self):
         while True:
-            debug.log("Starting render.")
+            debug.info("Starting render.")
             # If we need to refresh the overview data, do that
             if self.data.needs_refresh:
                 self.data.refresh_games()
 
-            debug.log(f"Games list/data to render: {self.data.games}")
+            debug.info(f"Games list/data to render: {self.data.games}")
 
             game = self.data.games[self.data.current_game_index]
 
             # Set the refresh rate
             rotate_rate = self.__rotate_rate_for_game(game)
             refresh_rate = self.data.config.data_refresh_rate
-            debug.log(f'Refresh rate: {refresh_rate}s')
+            debug.info(f'Refresh rate: {refresh_rate}s')
 
             endtime = t.time()
             time_delta = endtime - self.starttime
@@ -59,11 +61,11 @@ class MainRenderer:
             if time_delta >= refresh_rate and self.data.needs_refresh:
                 self.starttime = t.time()
                 self.data.needs_refresh = True
-                debug.log("Needs refresh!")
+                debug.info("Needs refresh!")
 
             if endtime - self.data.games_refresh_time >= refresh_rate:
                 self.data.needs_refresh = True
-                debug.log("Needs refresh!")
+                debug.info("Needs refresh!")
 
             # Draw the current game
             self.__draw_game(game)
@@ -75,13 +77,13 @@ class MainRenderer:
     def __rotate_rate_for_game(self, game):
         if game['state'] == 'Pre-Game':
             rotate_rate = self.data.config.rotation_rates_pregame
-            debug.log(f'Setting pre-game rotation rate: {rotate_rate}s')
+            debug.info(f'Setting pre-game rotation rate: {rotate_rate}s')
         elif game['state'] == 'Final':
             rotate_rate = self.data.config.rotation_rates_final
-            debug.log(f'Setting post game rotation rate: {rotate_rate}s')
+            debug.info(f'Setting post game rotation rate: {rotate_rate}s')
         else:
             rotate_rate = self.data.config.rotation_rates_live
-            debug.log(f'Setting rotation rate: {rotate_rate}s')
+            debug.info(f'Setting rotation rate: {rotate_rate}s')
         return rotate_rate
 
     def __should_rotate_to_next_game(self, game):
@@ -91,37 +93,37 @@ class MainRenderer:
 
         if live_game and self.data.config.rotation_preferred_team_live_enabled:
             if halftime_rotate and hasattr(game, 'play_by_play') and game['play_by_play'][-1]['play_result_type_id'] == 8:
-                debug.log("Halftime rotate!")
+                debug.info("Halftime rotate!")
                 rotate = True
             else:
-                debug.log("Live rotate!")
+                debug.info("Live rotate!")
                 rotate = True
 
-        debug.log(f'__should_rotate_to_next_game? {rotate}')
+        debug.info(f'__should_rotate_to_next_game? {rotate}')
         return rotate
 
     def __draw_game(self, game):
-        debug.log(f'Drawing game. __draw_game({game["id"]})')
+        debug.info(f'Drawing game. __draw_game({game["id"]})')
 
         gametime = self.data.get_gametime()
         one_hour_pregame = gametime - timedelta(hours=1)
 
         if game['state'] == 'In-Progress':
-            debug.log(f'State: Live Game, checking every {self.__rotate_rate_for_game(game)}s')
+            debug.info(f'State: Live Game, checking every {self.__rotate_rate_for_game(game)}s')
             self.data.refresh_games(game['id'])
             game = self.data.games[self.data.current_game_index]
             self._draw_live_game(game)
         elif game['state'] == 'Final':
-            debug.log('State: Post-Game')
+            debug.info('State: Post-Game')
             self._draw_post_game(game)
         elif gametime.now(get_localzone()) > one_hour_pregame and game['state'] == 'Pre-Game':
-            debug.log('Countdown til gametime')
+            debug.info('Countdown til gametime')
             self._draw_countdown(game)
         elif game['state'] == 'Pre-Game':
-            debug.log('State: Pre-Game')
+            debug.info('State: Pre-Game')
             self._draw_pregame(game)
         elif game['state'] == 'Postponed' or game['state'] == 'Cancelled':
-            debug.log(f'State: Game {game["state"]}.')
+            debug.info(f'State: Game {game["state"]}.')
             self.data.advance_to_next_game()
             self.__render_game()
 
@@ -228,15 +230,14 @@ class MainRenderer:
         # t.sleep(1)
 
     def _draw_live_game(self, game):
-        debug.log(game)
         last_play_code = game['play_result_type_id']
 
         # Use this code if you want the animations to run
         if last_play_code == 1:
-            debug.log('should draw TD')
+            debug.info('should draw TD')
             self._draw_td()
         elif last_play_code == 2:
-            debug.log('should draw FG')
+            debug.info('should draw FG')
             self._draw_fg()
 
         # TEMP Open the logo image file
@@ -307,7 +308,7 @@ class MainRenderer:
 
         # Check if the game is over
         if game['state'] == 'Final':
-            debug.log('GAME OVER')
+            debug.info('GAME OVER')
             self.data.needs_refresh = False
 
     def _draw_post_game(self, game):
@@ -352,7 +353,7 @@ class MainRenderer:
         self.data.needs_refresh = False
 
     def _draw_td(self):
-        debug.log('TD')
+        debug.info('TD')
         # Load the gif file
         ball = Image.open("assets/td_ball.gif")
         words = Image.open("assets/td_words.gif")
@@ -389,7 +390,7 @@ class MainRenderer:
             t.sleep(0.05)
 
     def _draw_fg(self):
-        debug.log('FG')
+        debug.info('FG')
         # Load the gif file
         im = Image.open("assets/fg.gif")
         if self.height == 64:

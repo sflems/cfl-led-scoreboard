@@ -1,11 +1,11 @@
 import json
 import os
 from utils import get_file
-import debug
-
+import logging 
 from . import config_models
 from pydantic import ValidationError
 
+debug = logging.getLogger("cfl-scoreboard")
 
 class ScoreboardConfig:
     try:
@@ -14,7 +14,7 @@ class ScoreboardConfig:
             config = config_models.ConfigModel.model_validate(input_json)
 
             # Preferred Teams
-            self.preferred_teams = config.preferred_teams
+            self.preferred_teams = list(config.preferred_teams)
 
             # Logo Selection
             self.helmet_logos = config.helmet_logos
@@ -31,6 +31,7 @@ class ScoreboardConfig:
 
             # Debug
             self.debug = config.debug
+            self.loglevel = config.loglevel
             self.testing = config.testing
 
             # Rotation Settings

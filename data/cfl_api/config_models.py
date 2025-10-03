@@ -50,5 +50,6 @@ class ConfigModel(BaseModel):
     data_refresh_rate: float = Field(...,
                                      ge=5, description="Sets refresh rate for games data. Overrides rotation rates to limit requests* (Min=5.0)")
     debug: bool = Field(default=False, description="Enable debugging.")
+    loglevel: str = Field(default="INFO", description="Set logging level.")
     testing: bool = Field(default=False, description="Enabled test data.")
     model_config = ConfigDict(title='CFL LED Scoreboard Config Schema', use_enum_values=True)
