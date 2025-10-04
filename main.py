@@ -7,6 +7,7 @@ from rgbmatrix import RGBMatrix
 from utils import args, led_matrix_options
 import logging
 import debug
+import threading
 from rich.traceback import install
 install(show_locals=True) 
 
@@ -41,16 +42,22 @@ def run():
 
       # Print some basic info on startup
       sb_logger.info("{} - v{} ({}x{})".format(SCRIPT_NAME, SCRIPT_VERSION, matrix.width, matrix.height))
+      
+      # Event used to sleep when rendering
+      # Allows Web API (coming in V2) and pushbutton to cancel the sleep
+      # Will also allow for weather alert to interrupt display board if you want
+      sleepEvent = threading.Event()
 
-      loading = Loading(matrix, SCRIPT_VERSION)
+      loading = Loading(matrix, SCRIPT_VERSION, sleepEvent)
       loading.render()
+      
 
       # This data will get passed throughout the entirety of this program.
       # It initializes all sorts of things like current season, teams, helper functions
       data = Data(config)
 
       # Initialize the  Renderer
-      MainRenderer(matrix, data).render()
+      MainRenderer(matrix, data, sleepEvent).render()
 
 if __name__ == "__main__":
     try:

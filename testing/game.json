@@ -1,0 +1,201 @@
+{   
+    "desc": "Ref: SCHEDULE_URL = '{base}/games?filter[date_start][ge]={day}' + API_KEY",
+    "data": [
+        {
+            "game_id": 2172,
+            "date_start": "2015-06-08T19:30:00-04:00",
+            "game_number": 1,
+            "week": 1,
+            "season": 2015,
+            "attendance": 0,
+            "event_type": {
+                "event_type_id": 0,
+                "name": "Preseason",
+                "title": ""
+            },
+            "event_status": {
+                "event_status_id": 4,
+                "name": "Final",
+                "is_active": false,
+                "quarter": 4,
+                "minutes": 0,
+                "seconds": 0,
+                "down": 3,
+                "yards_to_go": 13
+            },
+            "venue": {
+                "venue_id": 4,
+                "name": "Tim Hortons Field"
+            },
+            "weather": {
+                "temperature": 21,
+                "sky": "Overcast",
+                "wind_speed": "",
+                "wind_direction": "6km\/h SW",
+                "field_conditions": "Dry"
+            },
+            "coin_toss": {
+                "coin_toss_winner": "",
+                "coin_toss_winner_election": "Ottawa won coin toss and elected to receive."
+            },
+            "tickets_url": "http:\/\/www.ticats.ca\/tickets\/",
+            "team_1": {
+                "team_id": 6,
+                "location": "Ottawa",
+                "nickname": "Redblacks",
+                "abbreviation": "OTT",
+                "score": 10,
+                "venue_id": 6,
+                "linescores": [
+                    {
+                        "quarter": 1,
+                        "score": 0
+                    },
+                    {
+                        "quarter": 2,
+                        "score": 0
+                    },
+                    {
+                        "quarter": 3,
+                        "score": 0
+                    },
+                    {
+                        "quarter": 4,
+                        "score": 10
+                    }
+                ],
+                "is_at_home": false,
+                "is_winner": false
+            },
+            "team_2": {
+                "team_id": 4,
+                "location": "Hamilton",
+                "nickname": "Tiger-Cats",
+                "abbreviation": "HAM",
+                "score": 37,
+                "venue_id": 4,
+                "linescores": [
+                    {
+                        "quarter": 1,
+                        "score": 7
+                    },
+                    {
+                        "quarter": 2,
+                        "score": 13
+                    },
+                    {
+                        "quarter": 3,
+                        "score": 14
+                    },
+                    {
+                        "quarter": 4,
+                        "score": 3
+                    }
+                ],
+                "is_at_home": true,
+                "is_winner": true
+            }
+        },
+        {
+            "game_id": 2173,
+            "date_start": "2015-06-09T19:30:00-04:00",
+            "game_number": 2,
+            "week": 2,
+            "season": 2015,
+            "attendance": 5000,
+            "event_type": {
+                "event_type_id": 0,
+                "name": "Preseason",
+                "title": ""
+            },
+            "event_status": {
+                "event_status_id": 4,
+                "name": "Final",
+                "is_active": false,
+                "quarter": 4,
+                "minutes": 0,
+                "seconds": 0,
+                "down": 1,
+                "yards_to_go": 10
+            },
+            "venue": {
+                "venue_id": 10,
+                "name": "Toronto: Varsity Stadium"
+            },
+            "weather": {
+                "temperature": 16,
+                "sky": "Cloudy",
+                "wind_speed": "",
+                "wind_direction": "5 km per  hour",
+                "field_conditions": "Dry, artificial turf"
+            },
+            "coin_toss": {
+                "coin_toss_winner": "",
+                "coin_toss_winner_election": "Coin toss: Toronto won the toss and elected to receive."
+            },
+            "tickets_url": "http:\/\/www.argonauts.ca\/tickets\/",
+            "team_1": {
+                "team_id": 9,
+                "location": "Winnipeg",
+                "nickname": "Blue Bombers",
+                "abbreviation": "WPG",
+                "score": 34,
+                "venue_id": 9,
+                "linescores": [
+                    {
+                        "quarter": 1,
+                        "score": 3
+                    },
+                    {
+                        "quarter": 2,
+                        "score": 10
+                    },
+                    {
+                        "quarter": 3,
+                        "score": 14
+                    },
+                    {
+                        "quarter": 4,
+                        "score": 7
+                    }
+                ],
+                "is_at_home": false,
+                "is_winner": true
+            },
+            "team_2": {
+                "team_id": 8,
+                "location": "Toronto",
+                "nickname": "Argonauts",
+                "abbreviation": "TOR",
+                "score": 27,
+                "venue_id": 8,
+                "linescores": [
+                    {
+                        "quarter": 1,
+                        "score": 6
+                    },
+                    {
+                        "quarter": 2,
+                        "score": 0
+                    },
+                    {
+                        "quarter": 3,
+                        "score": 8
+                    },
+                    {
+                        "quarter": 4,
+                        "score": 13
+                    }
+                ],
+                "is_at_home": true,
+                "is_winner": false
+            }
+        }
+    ],
+    "errors": [
+
+    ],
+    "meta": {
+        "copyright": "Copyright 2017 Canadian Football League."
+    }
+}

@@ -10,17 +10,16 @@ debug = logging.getLogger("cfl-scoreboard")
 
 
 class MainRenderer:
-    def __init__(self, matrix, data):
+    def __init__(self, matrix, data, sleepEvent):
         """Initiates board renderer settings and displays CFL games."""
         self.matrix = matrix
         self.data = data
-        self.canvas = matrix.CreateFrameCanvas()
+        self.sleepEvent = sleepEvent
         self.width = matrix.width
         self.height = matrix.height
         self.aspect = calculate_aspect(self.width, self.height)
 
         debug.info(f"Aspect ratio detected: {self.aspect} ({self.width}x{self.height})")
-
         # Create a new data image.
         self.image = Image.new('RGB', (self.width, self.height))
         self.draw = ImageDraw.Draw(self.image)
@@ -108,21 +107,21 @@ class MainRenderer:
         gametime = self.data.get_gametime()
         one_hour_pregame = gametime - timedelta(hours=1)
 
-        if game['state'] == 'In-Progress':
+        if game['state'] == 'In-Progress': # TODO CONFIRM STATUSES WITH NEW API
             debug.info(f'State: Live Game, checking every {self.__rotate_rate_for_game(game)}s')
             self.data.refresh_games(game['id'])
             game = self.data.games[self.data.current_game_index]
             self._draw_live_game(game)
-        elif game['state'] == 'Final':
+        elif game['state'] in ['Final', 'Finished']:
             debug.info('State: Post-Game')
             self._draw_post_game(game)
-        elif gametime.now(get_localzone()) > one_hour_pregame and game['state'] == 'Pre-Game':
+        elif gametime.now(get_localzone()) > one_hour_pregame and game['state'] in ['Pre-Game', 'NotStarted']:
             debug.info('Countdown til gametime')
             self._draw_countdown(game)
-        elif game['state'] == 'Pre-Game':
+        elif game['state'] in ['Pre-Game', 'NotStarted']:
             debug.info('State: Pre-Game')
             self._draw_pregame(game)
-        elif game['state'] == 'Postponed' or game['state'] == 'Cancelled':
+        elif game['state']  in ['Postponed', 'Cancelled']: # TODO CONFIRM STATUSES WITH NEW API
             debug.info(f'State: Game {game["state"]}.')
             self.data.advance_to_next_game()
             self.__render_game()
