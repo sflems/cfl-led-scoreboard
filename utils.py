@@ -1,11 +1,12 @@
 import argparse
-import collections
+from collections.abc import Mapping
 import datetime
 import os
 import pytz
+import math
 from PIL import Image
 from tzlocal import get_localzone
-from rgbmatrix import RGBMatrixOptions, graphics
+from rgbmatrix import RGBMatrixOptions
 import logging
 
 debug = logging.getLogger("cfl-scoreboard")
@@ -128,13 +129,13 @@ def led_matrix_options(args):
 
     return options
 
-
+#
 def deep_update(source, overrides):
     """Update a nested dictionary or similar mapping.
     Modify ``source`` in place.
     """
     for key, value in list(overrides.items()):
-        if isinstance(value, collections.Mapping) and value:
+        if isinstance(value, Mapping) and value:
             returned = deep_update(source.get(key, {}), value)
             source[key] = returned
         else:
@@ -163,18 +164,23 @@ def calculate_aspect(width: int, height: int) -> str:
     return f"{x}:{y}"
 
 
-def get_logo(team, max_height, helmet=True) -> Image:
+def get_logo(team, max_height, helmet=True) -> Image.Image:
     """
     Gets logo from file and resizes to max height. Primary logos if arg passed.
     """
     if helmet is True:
-        logo_file = Image.open('logos/{}.png'.format(team.lower()))
+        logo_file = Image.open('assets/logos/{}.png'.format(team.lower()))
     else:
-        logo_file = Image.open('logos/primary/{}.png'.format(team.lower()))
+        logo_file = Image.open('assets/logos/primary/{}.png'.format(team.lower()))
 
     max_wh = max_height  # the maximum height and width
     width1, height1 = logo_file.size
     ratio1 = float(max_wh / height1)
     logo_out = logo_file.resize(
-        (int(width1 * ratio1), int(height1 * ratio1)), Image.BOX)
+        (int(width1 * ratio1), int(height1 * ratio1)), 4)
     return logo_out
+
+def round_normal(n, decimals=0):
+    multiplier = 10 ** decimals
+    value = math.floor(n * multiplier + 0.5) / multiplier
+    return int(value) if decimals == 0 else value

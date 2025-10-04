@@ -1,12 +1,12 @@
 import sys
-from data.cfl_api.scoreboard_config import ScoreboardConfig
-from data.cfl_api.data import Data
+from data.cfl_api import Data, ScoreboardConfig
 from renderer.main import MainRenderer
-from rgbmatrix import RGBMatrix, RGBMatrixOptions
+from renderer.loading_screen import Loading
+from renderer.matrix import Matrix
+from rgbmatrix import RGBMatrix
 from utils import args, led_matrix_options
 import logging
 import debug
-from rich.logging import RichHandler
 from rich.traceback import install
 install(show_locals=True) 
 
@@ -22,7 +22,6 @@ def run():
       # Get supplied command line arguments
       commandArgs = args()
 
-
       # Check for led configuration arguments
       matrixOptions = led_matrix_options(commandArgs)
       matrixOptions.drop_privileges = False
@@ -37,13 +36,17 @@ def run():
             debug.set_debug_status(config, loglevel=config.loglevel)
 
       # Initialize the matrix
-      matrix = RGBMatrix(options=matrixOptions)
+      #matrix = RGBMatrix(options=matrixOptions)
+      matrix = Matrix(RGBMatrix(options = matrixOptions))
 
       # Print some basic info on startup
       sb_logger.info("{} - v{} ({}x{})".format(SCRIPT_NAME, SCRIPT_VERSION, matrix.width, matrix.height))
 
-    # This data will get passed throughout the entirety of this program.
-    # It initializes all sorts of things like current season, teams, helper functions
+      loading = Loading(matrix, SCRIPT_VERSION)
+      loading.render()
+
+      # This data will get passed throughout the entirety of this program.
+      # It initializes all sorts of things like current season, teams, helper functions
       data = Data(config)
 
       # Initialize the  Renderer

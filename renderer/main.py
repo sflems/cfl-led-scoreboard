@@ -1,10 +1,10 @@
 import time as t
 from datetime import  timedelta
 import logging
-from numpy import kaiser
 from tzlocal import get_localzone
 from PIL import Image, ImageFont, ImageDraw
 from utils import center_text, calculate_aspect, get_logo
+
 
 debug = logging.getLogger("cfl-scoreboard")
 
@@ -25,12 +25,12 @@ class MainRenderer:
         self.image = Image.new('RGB', (self.width, self.height))
         self.draw = ImageDraw.Draw(self.image)
 
-        # Load the fonts
+        # Load the assets/fonts
         font_multiplier = int(self.height / 32)
-        self.font = ImageFont.truetype("fonts/score_large.otf", 16 * font_multiplier)
-        self.font_15 = ImageFont.truetype("fonts/score_large.otf", 15 * font_multiplier)
-        self.font_small = ImageFont.truetype("fonts/04B_24__.TTF", 12 * font_multiplier)
-        self.font_mini = ImageFont.truetype("fonts/04B_24__.TTF", 8 * font_multiplier)
+        self.font = ImageFont.truetype("assets/fonts/score_large.otf", 16 * font_multiplier)
+        self.font_15 = ImageFont.truetype("assets/fonts/score_large.otf", 15 * font_multiplier)
+        self.font_small = ImageFont.truetype("assets/fonts/04B_24__.TTF", 12 * font_multiplier)
+        self.font_mini = ImageFont.truetype("assets/fonts/04B_24__.TTF", 8 * font_multiplier)
 
     def render(self):
         """Displays CFL games on board depending on state."""
