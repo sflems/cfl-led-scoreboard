@@ -6,27 +6,32 @@ update
 # install some packages
 package "build-essential"
 package "git"
-package "direnv"
 package "python3-setuptools"
 package "python3-pip"
 package "python3-dev"
-package "python3-numpy"
 package "python3-venv"
+package "python3-gpiozero"
+package "python3-numpy"
 package "python3-lxml"
-package "libatlas-base-dev"
-package "libcairo2"
-package "libopenblas0"
-package "libatlas-base-dev"
-package "libraqm-dev"
 
 #For building latest rgbmatrix python bindings
 package "cython3"
+package "libcairo2"
+package "libopenblas0"
+package "libraqm-dev"
+package "direnv"
 
 #For dietpi users without dbus
 package "dbus"
 package "libdbus-glib-1-dev"
 package "libgirepository1.0-dev" 
 package "libdbus-1-dev"
+
+#For RGBMatrixEmulator
+package "python3-tk"
+package "libsixel-bin"
+package "python3-pygame"
+package "libgirepository1.0-dev"
 
 # you can also execute arbitrary bash
 echo "🚨  ALL GOOD TO GO"

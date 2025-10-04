@@ -70,7 +70,7 @@ python3 -m pip install --upgrade pip
 #This will install into the virtual environment
 
 tput bold; echo "$(tput setaf 2)Installing scoreboard python requirements in virtual environment...$(tput setaf 9)" ; tput sgr0
-pip3 install -r requirements.txt
+pip3 install -r requirements.txt --ignore-installed
 
 tput bold; echo "$(tput setaf 4)...................................................$(tput setaf 9)" ; tput sgr0
 tput bold; echo "$(tput setaf 4)TAKE NOTE OF NEXT LINES...$(tput setaf 9)" ; tput sgr0  
